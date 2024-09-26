@@ -1,0 +1,53 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+// Versioning
+def versionNumber = '1.0'
+def versionType = 'RELEASE' // RELEASE | BETA | ALPHA | DEV
+def versionMarker = versionType.charAt(0)
+
+group = 'it.italiandudes'
+version = versionNumber+versionMarker
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:25.0.0'
+    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'it.italiandudes:idl:1.0.5'
+}
+
+shadowJar {
+    manifest {
+        attributes "Main-Class" : "it.unimore.studenti.hackathon.Hackathon"
+        attributes "Title" : "Hackathon"
+        attributes "Vendor" : "UniMoRe"
+        attributes "Version" : archiveVersion.get()
+        attributes "Version-Number" : archiveVersion.get()
+        attributes "Version-Type" : versionType
+        attributes "Version-Marker" : versionMarker
+        attributes "Timestamp" : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+    }
+    archiveFileName = getRootDir().getName()+"-"+archiveVersion.get()+".jar"
+}
+
+tasks.register('buildJar') {
+    dependsOn shadowJar
+    group = "Build"
+    description = "Build and assemble project"
+}
+
+tasks.register('runClient', Exec) {
+    dependsOn shadowJar
+    group = "Execution"
+    description = "Build, assemble and run project"
+    standardInput = System.in
+    commandLine "java", "-jar", jar.archiveFile.get()
+}
