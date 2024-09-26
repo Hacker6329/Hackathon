@@ -1,9 +1,9 @@
 package it.unimore.studenti.hackathon.utils;
 
 import it.unimore.studenti.hackathon.data.ClientData;
+import it.unimore.studenti.hackathon.data.LineRead;
 import it.unimore.studenti.hackathon.data.TimeInterval;
 import it.unimore.studenti.hackathon.data.csv.CSVData;
-import it.unimore.studenti.hackathon.data.LineRead;
 import it.unimore.studenti.hackathon.exception.CSVParseException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

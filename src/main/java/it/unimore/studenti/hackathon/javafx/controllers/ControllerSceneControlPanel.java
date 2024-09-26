@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public final class ControllerSceneControlPanel {
 
     // Constants
-    public static final int DEFAULT_SAMPLE_RATE = 20;
+    public static final int DEFAULT_SAMPLE_RATE = 100;
 
     // Attributes
     private ArrayList<@NotNull ClientData> clientData = null;
@@ -98,6 +98,7 @@ public final class ControllerSceneControlPanel {
     private void hideGridPaneData() {
         gridPaneData.setVisible(false);
         labelNoClientChannel.setVisible(true);
+        dataSeries.getData().clear();
     }
     private void showGridPaneData() {
         labelNoClientChannel.setVisible(false);
@@ -118,8 +119,7 @@ public final class ControllerSceneControlPanel {
         dataSeries.getData().clear();
         if (intervals.isEmpty()) return;
         if (samplingRate <= 0) samplingRate = DEFAULT_SAMPLE_RATE;
-        int finalSamplingRate = samplingRate;
-        for (int i=0; i<intervals.size(); i+= finalSamplingRate) {
+        for (int i=0; i<intervals.size(); i+= samplingRate) {
             dataSeries.getData().add(new XYChart.Data<>(TimeInterval.DATE_FORMAT.format(intervals.get(i).getStartTime()), intervals.get(i).timeDifferenceMillis() / 60000.0f));
         }
     }
@@ -151,7 +151,7 @@ public final class ControllerSceneControlPanel {
         ClientData clientData = comboBoxClientData.getSelectionModel().getSelectedItem();
         Short channel = comboBoxDeviceChannel.getSelectionModel().getSelectedItem();
         if (clientData == null || channel == null) return;
-        int samplingRate = -1;
+        int samplingRate = DEFAULT_SAMPLE_RATE;
         if (!spinnerSampleRate.getEditor().getText().isEmpty()) {
             try {
                 samplingRate = Integer.parseInt(spinnerSampleRate.getEditor().getText());
@@ -163,12 +163,10 @@ public final class ControllerSceneControlPanel {
     }
     @FXML
     private void clientChange() {
+        nullClientComponents();
         comboBoxDeviceChannel.getSelectionModel().clearSelection();
         ClientData clientData = comboBoxClientData.getSelectionModel().getSelectedItem();
-        if (clientData == null) {
-            nullClientComponents();
-            return;
-        }
+        if (clientData == null) return;
         comboBoxDeviceChannel.setDisable(false);
         comboBoxDeviceChannel.setItems(FXCollections.observableArrayList(clientData.getDevices()));
     }
