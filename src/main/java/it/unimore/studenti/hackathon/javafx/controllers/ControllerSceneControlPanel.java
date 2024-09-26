@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public final class ControllerSceneControlPanel {
 
     // Constants
-    public static final int SAMPLE_RATE = 10;
+    public static final int DEFAULT_SAMPLE_RATE = 20;
 
     // Attributes
     private ArrayList<@NotNull ClientData> clientData = null;
@@ -60,7 +60,7 @@ public final class ControllerSceneControlPanel {
     @FXML
     private void initialize() {
         spinnerSampleRate.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
-        spinnerSampleRate.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1, 1));
+        spinnerSampleRate.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, DEFAULT_SAMPLE_RATE, 1));
         spinnerSampleRate.setEditable(true);
         lineChart.setLegendVisible(false);
         xAxis.setLabel("Data di Invio");
@@ -112,12 +112,12 @@ public final class ControllerSceneControlPanel {
         writeDataChart(clientData.getDeviceReadings().get(channel));
     }
     private void writeDataChart(@NotNull final ArrayList<@NotNull TimeInterval> intervals) {
-        writeDataChart(intervals, SAMPLE_RATE);
+        writeDataChart(intervals, DEFAULT_SAMPLE_RATE);
     }
     private void writeDataChart(@NotNull final ArrayList<@NotNull TimeInterval> intervals, int samplingRate) {
         dataSeries.getData().clear();
         if (intervals.isEmpty()) return;
-        if (samplingRate <= 0) samplingRate = SAMPLE_RATE;
+        if (samplingRate <= 0) samplingRate = DEFAULT_SAMPLE_RATE;
         int finalSamplingRate = samplingRate;
         for (int i=0; i<intervals.size(); i+= finalSamplingRate) {
             dataSeries.getData().add(new XYChart.Data<>(TimeInterval.DATE_FORMAT.format(intervals.get(i).getStartTime()), intervals.get(i).timeDifferenceMillis() / 60000.0f));
@@ -157,7 +157,7 @@ public final class ControllerSceneControlPanel {
                 samplingRate = Integer.parseInt(spinnerSampleRate.getEditor().getText());
             } catch (NumberFormatException ignored) {}
         }
-        if (samplingRate == -1) samplingRate = SAMPLE_RATE;
+        if (samplingRate == -1) samplingRate = DEFAULT_SAMPLE_RATE;
         writeDataChart(clientData.getDeviceReadings().get(channel).stream().filter(interval -> interval.getStartTime().getTime() >= numBegin && interval.getStartTime().getTime() <= numEnd).collect(Collectors.toCollection(ArrayList::new)), samplingRate);
         buttonFilter.setDisable(false);
     }
